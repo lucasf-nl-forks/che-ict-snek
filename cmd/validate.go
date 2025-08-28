@@ -5,8 +5,9 @@ package cmd
 
 import (
 	"fmt"
+	"snek/utils"
+
 	"github.com/spf13/viper"
-	"net/http"
 
 	"github.com/spf13/cobra"
 )
@@ -23,14 +24,8 @@ var validateCmd = &cobra.Command{
 			return
 		}
 
-		req, err := http.NewRequest("GET", host+"/api/auth/validate", nil)
-		req.Header.Add("X-Api-Key", key)
-		res, err := http.DefaultClient.Do(req)
+		err := utils.ValidateKey(host, key)
 		cobra.CheckErr(err)
-		if res.StatusCode != 200 {
-			cobra.CheckErr(fmt.Errorf("Login invalid: %s", res.Status))
-			return
-		}
 		fmt.Println("Login OK")
 	},
 }

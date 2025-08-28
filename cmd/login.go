@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"errors"
+	"snek/utils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,9 +32,13 @@ func authenticateWithWeb(cmd *cobra.Command, args []string) {
 }
 
 func authenticateWithKey(cmd *cobra.Command, args []string) {
+
+	err := utils.ValidateKey(args[0], Key)
+	cobra.CheckErr(err)
+
 	viper.Set("ApiServer", args[0])
 	viper.Set("ApiKey", Key)
-	err := viper.WriteConfig()
+	err = viper.WriteConfig()
 	cobra.CheckErr(err)
 }
 

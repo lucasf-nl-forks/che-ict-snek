@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -34,7 +33,8 @@ func initConfig() {
 	cobra.CheckErr(err)
 
 	configPath := filepath.Join(home, ".config")
-	err = os.MkdirAll(path.Dir(configPath), os.ModeDir)
+	err = os.MkdirAll(configPath, os.ModeDir)
+	cobra.CheckErr(err)
 
 	viper.AddConfigPath(configPath)
 	viper.SetConfigType("yaml")
