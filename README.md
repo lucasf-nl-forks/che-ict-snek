@@ -3,6 +3,10 @@ Snek is a CLI tool for interacting with [Longboi](https://github.com/che-ict/lon
 
 ## Installation
 Binary builds are provided for Windows, Mac and Linux. See the [releases page](https://github.com/che-ict/snek/releases) for more information.
+A small install script is also provided for Windows:
+```ps
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/che-ict/snek/main/install.ps1'))
+```
 
 ## Usage
 Snek has a few commands:
