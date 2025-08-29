@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"archive/zip"
 	"bytes"
+	"compress/flate"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/mholt/archiver"
 )
 
 type AttemptStatus struct {
@@ -24,63 +26,37 @@ type AttemptStatus struct {
 func ZipAndSubmitAttempt(directoryPath string, uploadEndpoint string, apiKey string) (AttemptStatus, error) {
 	// Create a temporary zip file
 	var result AttemptStatus
-	tempFile, err := os.CreateTemp("", "upload-*.zip")
+
+	tempDir, err := os.MkdirTemp("", "snek-attempt-*")
+	tempFile := filepath.Join(tempDir, "upload.zip")
+	fmt.Println(tempFile)
 	if err != nil {
 		return result, fmt.Errorf("failed to create temp file: %v", err)
 	}
-	defer os.Remove(tempFile.Name())
+	defer os.Remove(tempFile)
 
-	// Write directory contents to zip file
-	zw := zip.NewWriter(tempFile)
-	err = filepath.WalkDir(directoryPath, func(path string, d os.DirEntry, err error) error {
-		if err != nil {
-			return fmt.Errorf("failed to walk directory: %v", err)
-		}
+	z := archiver.Zip{
+		CompressionLevel:       flate.DefaultCompression,
+		MkdirAll:               false,
+		SelectiveCompression:   true,
+		ContinueOnError:        false,
+		OverwriteExisting:      false,
+		ImplicitTopLevelFolder: false,
+	}
 
-		relPath, _ := filepath.Rel(directoryPath, path)
-		if relPath == "." {
-			return nil
-		}
+	contents := []string{}
+	elems, _ := os.ReadDir(directoryPath)
+	for _, elem := range elems {
+		contents = append(contents, elem.Name())
+	}
 
-		info, _ := d.Info()
-		header, err := zip.FileInfoHeader(info)
-		if err != nil {
-			return fmt.Errorf("failed to create zip header: %v", err)
-		}
-		header.Method = zip.Deflate
-		header.Name = relPath
-
-		writer, err := zw.CreateHeader(header)
-		if err != nil {
-			return fmt.Errorf("failed to create zip header: %v", err)
-		}
-
-		if !d.IsDir() {
-			file, err := os.Open(path)
-			if err != nil {
-				return fmt.Errorf("failed to open file: %v", err)
-			}
-			defer file.Close()
-
-			_, err = io.Copy(writer, file)
-			if err != nil {
-				return fmt.Errorf("failed to write file to zip: %v", err)
-			}
-		}
-
-		return nil
-	})
+	err = z.Archive(contents, tempFile)
 	if err != nil {
 		return result, err
 	}
 
-	err = zw.Close()
-	if err != nil {
-		return result, fmt.Errorf("failed to close zip writer: %v", err)
-	}
-
 	// Reopen the zip file for reading
-	file, err := os.Open(tempFile.Name())
+	file, err := os.Open(tempFile)
 	if err != nil {
 		return result, fmt.Errorf("failed to reopen zip file: %v", err)
 	}
