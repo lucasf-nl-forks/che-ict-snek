@@ -29,7 +29,6 @@ func ZipAndSubmitAttempt(directoryPath string, uploadEndpoint string, apiKey str
 
 	tempDir, err := os.MkdirTemp("", "snek-attempt-*")
 	tempFile := filepath.Join(tempDir, "upload.zip")
-	fmt.Println(tempFile)
 	if err != nil {
 		return result, fmt.Errorf("failed to create temp file: %v", err)
 	}
