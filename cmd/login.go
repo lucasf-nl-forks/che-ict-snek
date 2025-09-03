@@ -4,8 +4,16 @@ Copyright © 2025 David Doorn <djdoorn@che.nl>
 package cmd
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/url"
 	"snek/utils"
+	"sync"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -28,7 +36,42 @@ var loginCmd = &cobra.Command{
 }
 
 func authenticateWithWeb(cmd *cobra.Command, args []string) {
-	panic("Web authentication not implemented yet, I'm terribly sorry")
+	srv := &http.Server{Addr: ":9123"}
+	var serveRef *http.Server = srv
+	ctx, cancel := context.WithCancel(context.Background())
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	http.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+		Key = r.URL.Query().Get("key")
+		err := utils.ValidateKey(args[0], Key)
+		cobra.CheckErr(err)
+		viper.Set("ApiServer", args[0])
+		viper.Set("ApiKey", Key)
+		err = viper.WriteConfig()
+		cobra.CheckErr(err)
+		log.Println("Logged in successfully")
+		w.WriteHeader(http.StatusOK)
+		io.WriteString(w, "Logged in successfully, you can close this window now")
+		cancel()
+	})
+
+	go func() {
+		defer wg.Done()
+		err := srv.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			cobra.CheckErr(err)
+		}
+	}()
+	dateStr := time.Now().Format("20060102")
+	escapedRedirect := url.QueryEscape("http://localhost:9123/token")
+	urlStr := fmt.Sprintf("%s/user/apikeys/automated/?name=snek%s&redirect=%s", args[0], dateStr, escapedRedirect)
+	fmt.Println("The following url should open in your default browser: ", urlStr)
+	err := utils.OpenURL(urlStr)
+	cobra.CheckErr(err)
+	<-ctx.Done()
+	serveRef.Shutdown(ctx)
+	wg.Wait()
 }
 
 func authenticateWithKey(cmd *cobra.Command, args []string) {
