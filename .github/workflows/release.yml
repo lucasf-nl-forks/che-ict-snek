@@ -12,12 +12,57 @@ jobs:
       packages: write
     strategy:
       matrix:
-      # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
-        goos: [linux, windows, darwin]
+      # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64, and a few more
+        goos: [linux, windows, darwin, freebsd, netbsd, openbsd, plan9]
         goarch: ["386", amd64, arm64]
         exclude:
           - goarch: "386"
             goos: darwin
+          - goarch: arm64
+            goos: plan9
+        include:
+          - goarch: arm
+            goos: windows
+          - goarch: amd64
+            goos: solaris
+          - goarch: mips64
+            goos: openbsd
+          - goarch: arm
+            goos: openbsd
+          - goarch: arm
+            goos: netbsd
+          - goarch: ppc64
+            goos: aix
+          - goarch: arm64
+            goos: android
+          - goarch: amd64
+            goos: dragonfly
+          - goarch: arm
+            goos: freebsd
+          - goarch: arm
+            goos: linux
+          - goarch: mips
+            goos: linux
+          - goarch: mips64
+            goos: linux
+          - goarch: mips64le
+            goos: linux
+          - goarch: mipsle
+            goos: linux
+          - goarch: ppc64
+            goos: linux
+          - goarch: ppc64le
+            goos: linux
+          - goarhc: riscv64
+            goos: linux
+          - goarch: s930x
+            goos: linux
+          - goarch: amd64
+            goos: illumos
+          - goarch: amd64
+            goos: ios
+          - goarch: wasm
+            goos: js
             
     steps:
       - uses: actions/checkout@v4
