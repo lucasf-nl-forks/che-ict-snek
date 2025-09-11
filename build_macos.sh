@@ -39,3 +39,20 @@ pkgbuild \
 productsign --sign "$MACOS_P12_NAME" snek.pkg snek-signed.pkg
 xcrun notarytool submit snek-signed.pkg --apple-id "$MACOS_APPLE_ID" --team-id "$MACOS_TEAM_ID" --password "$MACOS_APPLE_PASSWORD" --wait
 xcrun stapler staple snek-signed.pkg
+
+# packaging
+mkdir dmgroot
+cp snek-signed.pkg dmgroot/
+
+hdiutil create -volume "Snek Installer" \
+  -srcfolder dmgroot \
+  -ov -format UDZO snek.dmg
+
+# signing round 3
+codesign --force --sign "$MACOS_P12_APP_NAME" snek.dmg
+xcrun notarytool submit snek.dmg \
+  --apple-id "$MACOS_APPLE_ID" \
+  --team-id "$MACOS_TEAM_ID" \
+  --password "$MACOS_APPLE_PASSWORD" \
+  --wait
+xcrun stapler staple snek.dmg

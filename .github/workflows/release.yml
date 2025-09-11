@@ -67,3 +67,8 @@ jobs:
           MACOS_APPLE_ID: ${{ secrets.MACOS_APPLE_ID }}
           MACOS_TEAM_ID: ${{ secrets.MACOS_TEAM_ID }}
           MACOS_APPLE_PASSWORD: ${{ secrets.MACOS_APPLE_PASSWORD }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snek-dmg
+          path: snek.dmg
