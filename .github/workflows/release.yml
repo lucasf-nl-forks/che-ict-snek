@@ -54,6 +54,11 @@ jobs:
         env:
           MACOS_P12: ${{ secrets.MACOS_P12 }}
 
+      - run: |
+          echo "$MACOS_P12_APP" | base64 --decode > $RUNNER_TEMP/cert_app.p12
+        env:
+          MACOS_P12_APP: ${{ secrets.MACOS_P12_APP }}
+
       - run: chmod +x build_macos.sh && ./build_macos.sh
         env:
           MACOS_P12_PASSWORD: ${{ secrets.MACOS_P12_PASSWORD }}

@@ -13,12 +13,20 @@ security import $RUNNER_TEMP/cert.p12 \
   -A -t cert -f pkcs12 \
   -k "$KEYCHAIN_PATH"
 
+security import $RUNNER_TEMP/cert_app.p12 \
+  -P "$MACOS_P12_PASSWORD" \
+  -A -t cert -f pkcs12 \
+  -k "$KEYCHAIN_PATH"
+
 security list-keychains -s "$KEYCHAIN_PATH"
 security set-key-partition-list -S apple-tool:,apple: -s -k "$MACOS_P12_PASSWORD" "$KEYCHAIN_PATH"
 
 # pkg
 mkdir -p pkgroot/usr/local/bin
 cp snek pkgroot/usr/local/bin
+
+# sign binary
+codesign --force --options runtime --sign "$MACOS_P12_NAME" pkgroot/usr/local/bin/snek
 
 # build pkg
 pkgbuild \
