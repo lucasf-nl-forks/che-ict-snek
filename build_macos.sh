@@ -1,4 +1,4 @@
-go build
+GOOS=darwin GOARCH=amd64 go build
 find .
 
 # keychain
