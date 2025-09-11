@@ -1,11 +1,13 @@
 name: Release Go Application
 
 on:
+  push:
   release:
     types: [created]
 
 jobs:
   build-and-release:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -34,3 +36,13 @@ jobs:
           binary_name: "snek"
           extra_files: "README.md LICENSE"
           compress_assets: true
+
+  build-and-release-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: chmod +x build_macos.sh && ./build_macos.sh
