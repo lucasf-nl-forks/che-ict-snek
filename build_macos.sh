@@ -22,7 +22,7 @@ cp snek pkgroot/usr/local/bin
 
 # build pkg
 pkgbuild \
-  --root pkgroot
+  --root pkgroot \
   --identifier nl.che-ict.snek \
   --version 0.0 \
   --install-location / \
