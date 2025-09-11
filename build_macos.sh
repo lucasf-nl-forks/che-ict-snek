@@ -28,6 +28,6 @@ pkgbuild \
   --install-location / \
   snek.pkg
 
-productsign --sign $MACOS_P12_NAME snek.pkg snek-signed.pkg
-xcrun notarytool submit snek-signed.pkg --apple-id "$MACOS_APPLE_ID" --team-id "MACOS_TEAM_ID" --password "$MACOS_APPLE_PASSWORD" --wait
+productsign --sign "$MACOS_P12_NAME" snek.pkg snek-signed.pkg
+xcrun notarytool submit snek-signed.pkg --apple-id "$MACOS_APPLE_ID" --team-id "$MACOS_TEAM_ID" --password "$MACOS_APPLE_PASSWORD" --wait
 xcrun stapler staple snek-signed.pkg
