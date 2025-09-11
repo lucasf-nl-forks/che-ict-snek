@@ -44,7 +44,7 @@ xcrun stapler staple snek-signed.pkg
 mkdir dmgroot
 cp snek-signed.pkg dmgroot/
 
-hdiutil create -volume "Snek Installer" \
+hdiutil create -volname "Snek Installer" \
   -srcfolder dmgroot \
   -ov -format UDZO snek.dmg
 
