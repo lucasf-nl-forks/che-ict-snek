@@ -26,7 +26,7 @@ mkdir -p pkgroot/usr/local/bin
 cp snek pkgroot/usr/local/bin
 
 # sign binary
-codesign --force --options runtime --sign "$MACOS_P12_NAME" pkgroot/usr/local/bin/snek
+codesign --force --options runtime --sign "$MACOS_P12_APP_NAME" pkgroot/usr/local/bin/snek
 
 # build pkg
 pkgbuild \
