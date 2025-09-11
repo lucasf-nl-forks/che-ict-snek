@@ -27,6 +27,12 @@ cp snek pkgroot/usr/local/bin
 
 # sign binary
 codesign --force --options runtime --sign "$MACOS_P12_APP_NAME" pkgroot/usr/local/bin/snek
+xcrun notarytool submit pkgroot/usr/local/bin/snek \
+  --apple-id "$MACOS_APPLE_ID" \
+  --team-id "$MACOS_TEAM_ID" \
+  --password "$MACOS_APPLE_PASSWORD" \
+  --wait
+xcrun stapler staple pkgroot/usr/local/bin/snek
 
 # build pkg
 pkgbuild \
